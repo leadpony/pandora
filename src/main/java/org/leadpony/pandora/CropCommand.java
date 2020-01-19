@@ -37,11 +37,12 @@ import picocli.CommandLine.Parameters;
 @Command(name = "crop", description = "Assigns crop box to the PDF")
 class CropCommand implements Callable<Integer> {
 
-    @Parameters(index = "0", description = "input PDF")
+    @Parameters(index = "0",
+            description = "path to the original PDF")
     private Path input;
 
     @Option(names = {"-o", "--output"},
-            description = "output PDF",
+            description = "path to the cropped PDF",
             required = true)
     private Path output;
 
@@ -51,6 +52,14 @@ class CropCommand implements Callable<Integer> {
             required = true
             )
     private Margin margin;
+
+    @Option(names = "--first",
+            description = "first page index starting from zero")
+    private int first = 0;
+
+    @Option(names = "--last",
+            description = "last page index starting from zero")
+    private int last = -1;
 
     CropCommand() {
     }
@@ -65,8 +74,13 @@ class CropCommand implements Callable<Integer> {
     }
 
     private void cropAllPages(PDDocument doc) {
-        for (PDPage page : doc.getPages()) {
-            cropPage(page);
+        final int total = doc.getNumberOfPages();
+        final int first = this.first;
+        final int last = (this.last >= 0) ? this.last : (total + this.last);
+        for (int i = 0; i < total; i++) {
+            if (first <= i && i <= last) {
+                cropPage(doc.getPage(i));
+            }
         }
     }
 

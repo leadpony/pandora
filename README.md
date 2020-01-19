@@ -20,13 +20,21 @@ Commands:
 #### crop
 
 ```
-Usage: pandora crop -m=<top,right,bottom,left> -o=<output> <input>
+Usage: pandora crop [--first=<first>] [--last=<last>] -m=<top,right,bottom,
+                    left> -o=<output> <input>
 Assigns crop box to the PDF
-      <input>             input PDF
+      <input>             path to the original PDF
+      --first=<first>     first page index starting from zero
+      --last=<last>       last page index starting from zero
   -m, --margin=<top,right,bottom,left>
                           Specify margin in 1/72 inch or %
-  -o, --output=<output>   output PDF
+  -o, --output=<output>   path to the cropped PDF
 ```
+Example:
+```
+pandora crop --first 2 --last -2 -m 50,40,30,40 -o Classic_Shell_Scripting.cropped.pdf Classic_Shell_Scripting.pdf
+```
+
 
 ## Copyright Notice
 Copyright 2020 the original author or authors. All rights reserved.
