@@ -54,13 +54,26 @@ class Margin {
 
     static Margin valueOf(String value) {
         String[] parts = value.split(",");
-        if (parts.length != 4) {
+        if (parts.length < 1 || parts.length > 4) {
             throw new IllegalArgumentException();
         }
         List<Entry> entries = new ArrayList<>();
         for (String part : parts) {
             entries.add(createEntry(part));
         }
+
+        switch (entries.size()) {
+        case 1:
+            entries.add(entries.get(0));
+        case 2:
+            entries.add(entries.get(0));
+        case 3:
+            entries.add(entries.get(1));
+            break;
+        default:
+            break;
+        }
+
         return new Margin(entries);
     }
 

@@ -57,9 +57,10 @@ class CropCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        PDDocument doc = load(input);
-        cropAllPages(doc);
-        save(doc, output);
+        try (PDDocument doc = load(input)) {
+            cropAllPages(doc);
+            save(doc, output);
+        }
         return 0;
     }
 

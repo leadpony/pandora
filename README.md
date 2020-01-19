@@ -1,5 +1,9 @@
 # Pandora
 
+## Requirements
+
+* Java 9 or higher
+
 ## Usage
 
 ```
