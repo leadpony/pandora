@@ -1,30 +1,4 @@
 # Pandora
-
-## Usage
-
-```
-Usage: pandora [-hV] COMMAND
-Pandora
-  -h, --help      Show this help message and exit.
-  -V, --version   Print version information and exit.
-Commands:
-  help  Displays help information about the specified command
-  crop  Assigns crop box to the PDF
-```
-
-## Commands
-#### crop
-
-```
-Usage: pandora crop -m=<top,right,bottom,left> -o=<output> <input>
-Assigns crop box to the PDF
-      <input>             input PDF
-  -m, --margin=<top,right,bottom,left>
-                          Specify margin in 1/72 inch or %
-  -o, --output=<output>   output PDF
-```
-
-## Copyright Notice
 Copyright 2020 the original author or authors. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
