@@ -26,28 +26,28 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
  */
 class Margin {
 
-    private final Entry top;
-    private final Entry right;
-    private final Entry bottom;
-    private final Entry left;
+    private final Length top;
+    private final Length right;
+    private final Length bottom;
+    private final Length left;
 
-    private Margin(List<Entry> entries) {
+    private Margin(List<Length> entries) {
         this.top = entries.get(0);
         this.right = entries.get(1);
         this.bottom = entries.get(2);
         this.left = entries.get(3);
     }
 
-    PDRectangle getRectangle(PDRectangle whole) {
-        final float top = this.top.getValue(whole.getHeight());
-        final float right = this.right.getValue(whole.getWidth());
-        final float bottom = this.bottom.getValue(whole.getHeight());
-        final float left = this.left.getValue(whole.getWidth());
+    PDRectangle getRectangle(PDRectangle page) {
+        final float top = this.top.apply(page.getHeight());
+        final float right = this.right.apply(page.getWidth());
+        final float bottom = this.bottom.apply(page.getHeight());
+        final float left = this.left.apply(page.getWidth());
 
-        final float x = whole.getLowerLeftX() + left;
-        final float y = whole.getLowerLeftY() + bottom;
-        final float width = whole.getWidth() - (left + right);
-        final float height = whole.getHeight() - (top + bottom);
+        final float x = page.getLowerLeftX() + left;
+        final float y = page.getLowerLeftY() + bottom;
+        final float width = page.getWidth() - (left + right);
+        final float height = page.getHeight() - (top + bottom);
 
         return new PDRectangle(x, y, width, height);
     }
@@ -57,9 +57,9 @@ class Margin {
         if (parts.length < 1 || parts.length > 4) {
             throw new IllegalArgumentException();
         }
-        List<Entry> entries = new ArrayList<>();
+        List<Length> entries = new ArrayList<>();
         for (String part : parts) {
-            entries.add(createEntry(part));
+            entries.add(createLength(part));
         }
 
         switch (entries.size()) {
@@ -77,30 +77,36 @@ class Margin {
         return new Margin(entries);
     }
 
-    private static Entry createEntry(String value) {
+    private static Length createLength(String value) {
         if (value.endsWith("%")) {
             value = value.substring(0, value.length() - 1);
-            return new Entry(Float.valueOf(value), true);
+            return new Percentage(Float.valueOf(value));
         } else {
-            return new Entry(Float.valueOf(value), false);
+            return new Length(Float.valueOf(value));
         }
     }
 
-    static class Entry {
-        private final float value;
-        private final boolean percent;
+    private static class Length {
+        protected final float value;
 
-        Entry(float value, boolean percent) {
+        Length(float value) {
             this.value = value;
-            this.percent = percent;
         }
 
-        float getValue(float length) {
-            if (percent) {
-                return length * value / 100.f;
-            } else {
-                return value;
-            }
+        float apply(float fullLength) {
+            return value;
         }
-    };
+    }
+
+    private static class Percentage extends Length {
+
+        Percentage(float value) {
+            super(value);
+        }
+
+        @Override
+        float apply(float fullLength) {
+            return fullLength * value / 100.f;
+        }
+    }
 }

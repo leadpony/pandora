@@ -48,7 +48,7 @@ class CropCommand implements Callable<Integer> {
 
     @Option(names = {"-m", "--margin"},
             paramLabel = "<top,right,bottom,left>",
-            description = "Specify margin in 1/72 inch or %%",
+            description = "margin in 1/72 inch or %%",
             required = true
             )
     private Margin margin;
@@ -60,6 +60,10 @@ class CropCommand implements Callable<Integer> {
     @Option(names = "--last",
             description = "last page index starting from zero")
     private int last = -1;
+
+    @Option(names = "--preserve-aspect",
+            description = "preserve aspect ratio")
+    private boolean preserveAspect;
 
     CropCommand() {
     }
@@ -87,7 +91,29 @@ class CropCommand implements Callable<Integer> {
     private void cropPage(PDPage page) {
         PDRectangle mediaBox = page.getMediaBox();
         PDRectangle cropBox = margin.getRectangle(mediaBox);
+        if (preserveAspect) {
+            cropBox = adjustBox(cropBox, mediaBox);
+        }
         page.setCropBox(cropBox);
+    }
+
+    private static PDRectangle adjustBox(PDRectangle box, PDRectangle page) {
+        float aspectRatio = page.getWidth() / page.getHeight();
+        return adjustBox(box, aspectRatio);
+    }
+
+    private static PDRectangle adjustBox(PDRectangle box, float aspectRatio) {
+        final float newAspectRatio = box.getWidth() / box.getHeight();
+        if (newAspectRatio < aspectRatio) {
+            float width = box.getHeight() * aspectRatio;
+            float x = box.getLowerLeftX() - 0.5f * (width - box.getWidth());
+            return new PDRectangle(x, box.getLowerLeftY(), width, box.getHeight());
+        } else if (newAspectRatio > aspectRatio) {
+            float height = box.getWidth() / aspectRatio;
+            float y = box.getLowerLeftY() - 0.5f * (height - box.getHeight());
+            return new PDRectangle(box.getLowerLeftX(), y, box.getWidth(), height);
+        }
+        return box;
     }
 
     private static PDDocument load(Path path) throws IOException {
