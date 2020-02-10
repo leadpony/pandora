@@ -68,7 +68,8 @@ class PandoraCommand {
                 .setOut(out)
                 .setErr(err);
 
-        commandLine.registerConverter(Margin.class, Margin::valueOf);
+        commandLine.registerConverter(Margin.class, Margin::valueOf)
+                   .registerConverter(Pages.class, Pages::valueOf);
 
         if (args.length > 0) {
             return commandLine.execute(args);

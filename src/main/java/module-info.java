@@ -22,9 +22,9 @@ module org.leadpony.pandora {
 
     requires info.picocli;
     requires org.apache.pdfbox;
-    
+
     opens org.leadpony.pandora to info.picocli;
-    
+
     provides java.util.spi.ToolProvider
         with org.leadpony.pandora.PandoraToolProvider;
 }

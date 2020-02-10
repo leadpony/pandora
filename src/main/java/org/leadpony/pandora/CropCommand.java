@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
+import java.util.function.IntPredicate;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -53,13 +54,10 @@ class CropCommand implements Callable<Integer> {
             )
     private Margin margin;
 
-    @Option(names = "--first",
-            description = "first page index starting from zero")
-    private int first = 0;
-
-    @Option(names = "--last",
-            description = "last page index starting from zero")
-    private int last = -1;
+    @Option(names = "--pages",
+            paramLabel = "<page|range(,page|range)*>",
+            description = "pages or page ranges")
+    private Pages pages = Pages.all();
 
     @Option(names = "--preserve-aspect",
             description = "preserve aspect ratio")
@@ -78,11 +76,10 @@ class CropCommand implements Callable<Integer> {
     }
 
     private void cropAllPages(PDDocument doc) {
-        final int total = doc.getNumberOfPages();
-        final int first = this.first;
-        final int last = (this.last >= 0) ? this.last : (total + this.last);
-        for (int i = 0; i < total; i++) {
-            if (first <= i && i <= last) {
+        final int totalPages = doc.getNumberOfPages();
+        IntPredicate predicate = pages.testing(totalPages);
+        for (int i = 0; i < totalPages; i++) {
+            if (predicate.test(i + 1)) {
                 cropPage(doc.getPage(i));
             }
         }
