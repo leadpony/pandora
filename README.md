@@ -20,19 +20,20 @@ Commands:
 #### crop
 
 ```
-Usage: pandora crop [--first=<first>] [--last=<last>] -m=<top,right,bottom,
-                    left> -o=<output> <input>
+Usage: pandora crop [--preserve-aspect] -m=<top,right,bottom,left> -o=<output>
+                    [--pages=<page|range(,page|range)*>] <input>
 Assigns crop box to the PDF
       <input>             path to the original PDF
-      --first=<first>     first page index starting from zero
-      --last=<last>       last page index starting from zero
   -m, --margin=<top,right,bottom,left>
-                          Specify margin in 1/72 inch or %
+                          margin in 1/72 inch or %
   -o, --output=<output>   path to the cropped PDF
+      --pages=<page|range(,page|range)*>
+                          pages or page ranges
+      --preserve-aspect   preserve aspect ratio
 ```
 Example:
-```
-pandora crop --first 2 --last -2 -m 50,40,30,40 -o Classic_Shell_Scripting.cropped.pdf Classic_Shell_Scripting.pdf
+```shell
+pandora crop --pages 3:-1 -m 50,40,30 --preserve-aspect -o Classic_Shell_Scripting.cropped.pdf Classic_Shell_Scripting.pdf
 ```
 
 
