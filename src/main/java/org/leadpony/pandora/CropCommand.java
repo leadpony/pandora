@@ -16,36 +16,17 @@
 
 package org.leadpony.pandora;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.concurrent.Callable;
-import java.util.function.IntPredicate;
-
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 
 /**
  * @author leadpony
  */
 @Command(name = "crop", description = "Assigns crop box to the PDF")
-class CropCommand implements Callable<Integer> {
-
-    @Parameters(index = "0",
-            description = "path to the original PDF")
-    private Path input;
-
-    @Option(names = {"-o", "--output"},
-            description = "path to the cropped PDF",
-            required = true)
-    private Path output;
+class CropCommand extends AbstractCommand {
 
     @Option(names = {"-m", "--margin"},
             paramLabel = "<top,right,bottom,left>",
@@ -54,38 +35,12 @@ class CropCommand implements Callable<Integer> {
             )
     private Margin margin;
 
-    @Option(names = "--pages",
-            paramLabel = "<page|range(,page|range)*>",
-            description = "pages or page ranges")
-    private Pages pages = Pages.all();
-
     @Option(names = "--preserve-aspect",
             description = "preserve aspect ratio")
     private boolean preserveAspect;
 
-    CropCommand() {
-    }
-
     @Override
-    public Integer call() throws Exception {
-        try (PDDocument doc = load(input)) {
-            cropAllPages(doc);
-            save(doc, output);
-        }
-        return 0;
-    }
-
-    private void cropAllPages(PDDocument doc) {
-        final int totalPages = doc.getNumberOfPages();
-        IntPredicate predicate = pages.testing(totalPages);
-        for (int i = 0; i < totalPages; i++) {
-            if (predicate.test(i + 1)) {
-                cropPage(doc.getPage(i));
-            }
-        }
-    }
-
-    private void cropPage(PDPage page) {
+    protected void processPage(PDPage page) {
         PDRectangle mediaBox = page.getMediaBox();
         PDRectangle cropBox = margin.getRectangle(mediaBox);
         if (preserveAspect) {
@@ -111,17 +66,5 @@ class CropCommand implements Callable<Integer> {
             return new PDRectangle(box.getLowerLeftX(), y, box.getWidth(), height);
         }
         return box;
-    }
-
-    private static PDDocument load(Path path) throws IOException {
-        try (InputStream input = Files.newInputStream(path)) {
-            return PDDocument.load(input);
-        }
-    }
-
-    private static void save(PDDocument doc, Path path) throws IOException {
-        try (OutputStream output = Files.newOutputStream(path)) {
-            doc.save(output);
-        }
     }
 }
