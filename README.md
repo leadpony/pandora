@@ -21,9 +21,9 @@ Assigns crop box to the PDF.
 pandora crop [--even] [--odd] [--preserve-aspect] -m=<top,right,bottom,left> or "bbox" -o=<output> [--pages=<page|range(,page|range)*>] <input>
 ```
 #### --even
-This option causes only _even_ pages to be copped.
+This option causes only _even_ pages to be cropped.
 
-#### -m, --margin=\<top,right,bottom,left\> or "bbox"
+#### -m, --margin=\<top,right,bottom,left\> or `bbox`
 Each margin value can be specified in 1/72 inch or in percentage followed by %.
 Special value `bbox` means the bounding box of the page, which is automatically calculated.
 
@@ -31,7 +31,7 @@ Special value `bbox` means the bounding box of the page, which is automatically 
 This option specifies the path where the modified PDF will be outputted.
 
 #### --odd
-This option causes only _odd_ pages to be copped.
+This option causes only _odd_ pages to be cropped.
 
 #### --pages=<page|range(,page|range)*>
 This option limits the pages to be cropped using their page numbers. The page number starts from 1 and negative values start from the final page of the document. The page ranges can be presented in the form of `<start page>:<end page>` where both bounds are inclusive.

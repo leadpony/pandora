@@ -380,14 +380,14 @@ code {
 <pre class="hljs"><code><div>pandora crop [--even] [--odd] [--preserve-aspect] -m=&lt;top,right,bottom,left&gt; or "bbox" -o=&lt;output&gt; [--pages=&lt;page|range(,page|range)*&gt;] &lt;input&gt;
 </div></code></pre>
 <h4 id="even">--even</h4>
-<p>This option causes only <em>even</em> pages to be copped.</p>
-<h4 id="m---margintoprightbottomleft-or-%22bbox%22">-m, --margin=&lt;top,right,bottom,left&gt; or &quot;bbox&quot;</h4>
-<p>Each margin value can be specified in 1/72 inch or in percentage followed by %.<br>
+<p>This option causes only <em>even</em> pages to be cropped.</p>
+<h4 id="m---margintoprightbottomleft-or-bbox">-m, --margin=&lt;top,right,bottom,left&gt; or <code>bbox</code></h4>
+<p>Each margin value can be specified in 1/72 inch or in percentage followed by %.
 Special value <code>bbox</code> means the bounding box of the page, which is automatically calculated.</p>
 <h4 id="o---outputoutput">-o, --output=&lt;output&gt;</h4>
 <p>This option specifies the path where the modified PDF will be outputted.</p>
 <h4 id="odd">--odd</h4>
-<p>This option causes only <em>odd</em> pages to be copped.</p>
+<p>This option causes only <em>odd</em> pages to be cropped.</p>
 <h4 id="pagespagerangepagerange">--pages=&lt;page|range(,page|range)*&gt;</h4>
 <p>This option limits the pages to be cropped using their page numbers. The page number starts from 1 and negative values start from the final page of the document. The page ranges can be presented in the form of <code>&lt;start page&gt;:&lt;end page&gt;</code> where both bounds are inclusive.</p>
 <h4 id="preserve-aspect">--preserve-aspect</h4>
