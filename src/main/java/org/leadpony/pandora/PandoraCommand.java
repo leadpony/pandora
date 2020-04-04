@@ -16,10 +16,13 @@
 
 package org.leadpony.pandora;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.logging.LogManager;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -61,6 +64,8 @@ class PandoraCommand {
     }
 
     public int run(String... args) {
+        configureLoggers();
+
         CommandLine commandLine = new CommandLine(this)
                 .addSubcommand(new CommandLine.HelpCommand())
                 .addSubcommand(new CropCommand())
@@ -84,5 +89,13 @@ class PandoraCommand {
                 BUNDLE_BASE_NAME,
                 Locale.getDefault(),
                 PandoraCommand.class.getClassLoader());
+    }
+
+    private void configureLoggers() {
+        LogManager manager = LogManager.getLogManager();
+        try (InputStream in = getClass().getResourceAsStream("logging.properties")) {
+            manager.readConfiguration(in);
+        } catch (IOException e) {
+        }
     }
 }

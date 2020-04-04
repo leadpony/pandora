@@ -14,22 +14,28 @@
  * limitations under the License.
  */
 
+package org.leadpony.pandora;
+
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+
 /**
+ * A strategy for cropping pages.
+ *
  * @author leadpony
  */
-module org.leadpony.pandora {
+interface CroppingStrategy {
 
-    requires java.desktop;
-    requires java.logging;
+    /**
+     * The strategy using the bounding box of the page.
+     */
+    CroppingStrategy BOUNDING_BOX_STRATEGY = new BoundsCroppingStrategy();
 
-    requires info.picocli;
-    requires org.apache.pdfbox;
-    requires org.apache.fontbox;
-
-    opens org.leadpony.pandora to info.picocli;
-
-    exports org.leadpony.pandora;
-
-    provides java.util.spi.ToolProvider
-        with org.leadpony.pandora.PandoraToolProvider;
+    /**
+     * Calculates the crop box of the page.
+     *
+     * @param page the page to crop.
+     * @return the crop box calculated, must not be {@code null}.
+     */
+    PDRectangle getCropBox(PDPage page);
 }

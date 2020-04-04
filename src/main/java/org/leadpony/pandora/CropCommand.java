@@ -16,6 +16,7 @@
 
 package org.leadpony.pandora;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
@@ -29,20 +30,30 @@ import picocli.CommandLine.Option;
 class CropCommand extends AbstractCommand {
 
     @Option(names = {"-m", "--margin"},
-            paramLabel = "<top,right,bottom,left>",
-            description = "margin in 1/72 inch or %%",
+            paramLabel = "<top,right,bottom,left> or \"bbox\"",
+            description = {
+               "margin each specified by 1/72 inch or %%",
+               "\"bbox\" means bounding box of the page"
+            },
             required = true
             )
     private Margin margin;
 
     @Option(names = "--preserve-aspect",
-            description = "preserve aspect ratio")
+            description = "preserve the aspect ratio of the page")
     private boolean preserveAspect;
+
+    private CroppingStrategy strategy;
+
+    @Override
+    protected void beginProcessing(PDDocument doc) {
+        this.strategy = margin.createStrategy(doc);
+    }
 
     @Override
     protected void processPage(PDPage page) {
         PDRectangle mediaBox = page.getMediaBox();
-        PDRectangle cropBox = margin.getRectangle(mediaBox);
+        PDRectangle cropBox = strategy.getCropBox(page);
         if (preserveAspect) {
             cropBox = adjustBox(cropBox, mediaBox);
         }

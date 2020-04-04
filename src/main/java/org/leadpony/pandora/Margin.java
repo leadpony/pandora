@@ -16,97 +16,38 @@
 
 package org.leadpony.pandora;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.PDDocument;
 
 /**
+ * A margin option.
+ *
  * @author leadpony
  */
-class Margin {
+interface Margin {
 
-    private final Length top;
-    private final Length right;
-    private final Length bottom;
-    private final Length left;
+    Margin BOUNDING_BOX_MARGIN = doc -> CroppingStrategy.BOUNDING_BOX_STRATEGY;
 
-    private Margin(List<Length> entries) {
-        this.top = entries.get(0);
-        this.right = entries.get(1);
-        this.bottom = entries.get(2);
-        this.left = entries.get(3);
-    }
-
-    PDRectangle getRectangle(PDRectangle page) {
-        final float top = this.top.apply(page.getHeight());
-        final float right = this.right.apply(page.getWidth());
-        final float bottom = this.bottom.apply(page.getHeight());
-        final float left = this.left.apply(page.getWidth());
-
-        final float x = page.getLowerLeftX() + left;
-        final float y = page.getLowerLeftY() + bottom;
-        final float width = page.getWidth() - (left + right);
-        final float height = page.getHeight() - (top + bottom);
-
-        return new PDRectangle(x, y, width, height);
-    }
-
+    /**
+     * Creates an instance of Margin from the specified string value.
+     *
+     * @param value the value of the option parameter.
+     * @return newly created instance of margin.
+     */
     static Margin valueOf(String value) {
-        String[] parts = value.split(",");
-        if (parts.length < 1 || parts.length > 4) {
-            throw new IllegalArgumentException();
+        Objects.requireNonNull(value, "value must not be null.");
+        if ("bbox".equalsIgnoreCase(value)) {
+            return BOUNDING_BOX_MARGIN;
         }
-        List<Length> entries = new ArrayList<>();
-        for (String part : parts) {
-            entries.add(createLength(part));
-        }
-
-        switch (entries.size()) {
-        case 1:
-            entries.add(entries.get(0));
-        case 2:
-            entries.add(entries.get(0));
-        case 3:
-            entries.add(entries.get(1));
-            break;
-        default:
-            break;
-        }
-
-        return new Margin(entries);
+        return FixedMargin.valueOf(value);
     }
 
-    private static Length createLength(String value) {
-        if (value.endsWith("%")) {
-            value = value.substring(0, value.length() - 1);
-            return new Percentage(Float.valueOf(value));
-        } else {
-            return new Length(Float.valueOf(value));
-        }
-    }
-
-    private static class Length {
-        protected final float value;
-
-        Length(float value) {
-            this.value = value;
-        }
-
-        float apply(float fullLength) {
-            return value;
-        }
-    }
-
-    private static class Percentage extends Length {
-
-        Percentage(float value) {
-            super(value);
-        }
-
-        @Override
-        float apply(float fullLength) {
-            return fullLength * value / 100.f;
-        }
-    }
+    /**
+     * Creates a cropping strategy for this margin.
+     *
+     * @param doc the document to crop.
+     * @return newly created instance of cropping strategy.
+     */
+    CroppingStrategy createStrategy(PDDocument doc);
 }

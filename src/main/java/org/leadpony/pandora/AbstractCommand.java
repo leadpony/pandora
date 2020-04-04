@@ -51,7 +51,12 @@ abstract class AbstractCommand implements Callable<Integer> {
 
     @Option(names = "--pages",
             paramLabel = "<page|range(,page|range)*>",
-            description = "pages or page ranges, starting from 1")
+            description = {
+                "pages or page ranges delimited by comma",
+                "ranges are specified by the form <start page number>:<end page nubmer>,",
+                "both limits are inclusive",
+                "page number starts from 1 and -1 denotes the final page of the document"
+            })
     private Pages pages = Pages.all();
 
     @Option(names = "--even",
@@ -71,8 +76,11 @@ abstract class AbstractCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         try (PDDocument doc = load(input)) {
-            process(doc);
+            processDoc(doc);
             save(doc, output);
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+            return 1;
         }
         return 0;
     }
@@ -82,7 +90,8 @@ abstract class AbstractCommand implements Callable<Integer> {
      *
      * @param doc the PDF document to process, never be {@code null}.
      */
-    private void process(PDDocument doc) {
+    protected void processDoc(PDDocument doc) {
+        beginProcessing(doc);
         final int totalPages = doc.getNumberOfPages();
         IntPredicate predicate = getPagePredicate(totalPages);
         for (int i = 0; i < totalPages; i++) {
@@ -91,6 +100,8 @@ abstract class AbstractCommand implements Callable<Integer> {
             }
         }
     }
+
+    protected abstract void beginProcessing(PDDocument doc);
 
     /**
      * Processes a page of the PDF document.

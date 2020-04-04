@@ -2,7 +2,7 @@
 
 ## Requirements
 
-* Java 9 or higher
+* Java 11 or higher
 
 ## Usage
 
