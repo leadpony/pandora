@@ -91,6 +91,7 @@ abstract class AbstractCommand implements Callable<Integer> {
      * @param doc the PDF document to process, never be {@code null}.
      */
     protected void processDoc(PDDocument doc) {
+        doc.setAllSecurityToBeRemoved(true);
         beginProcessing(doc);
         final int totalPages = doc.getNumberOfPages();
         IntPredicate predicate = getPagePredicate(totalPages);
