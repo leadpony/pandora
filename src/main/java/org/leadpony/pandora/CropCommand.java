@@ -44,7 +44,7 @@ class CropCommand extends AbstractCommand {
             description = "preserve the aspect ratio of the page")
     private boolean preserveAspect;
 
-    private CroppingStrategy strategy;
+    private CropStrategy strategy;
 
     @Override
     protected void beginProcessing(PDDocument doc) {

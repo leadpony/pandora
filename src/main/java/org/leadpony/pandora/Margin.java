@@ -27,8 +27,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
  */
 interface Margin {
 
-    Margin BOUNDING_BOX_MARGIN = doc -> CroppingStrategy.BOUNDING_BOX_STRATEGY;
-    Margin TEXT_BOUNDING_BOX_MARGIN = doc -> CroppingStrategy.TEXT_BOUNDING_BOX_STRATEGY;
+    Margin BOUNDING_BOX_MARGIN = doc -> CropStrategy.BOUNDING_BOX_STRATEGY;
+    Margin TEXT_BOUNDING_BOX_MARGIN = doc -> CropStrategy.TEXT_BOUNDING_BOX_STRATEGY;
 
     /**
      * Creates an instance of Margin from the specified string value.
@@ -52,5 +52,5 @@ interface Margin {
      * @param doc the document to crop.
      * @return newly created instance of cropping strategy.
      */
-    CroppingStrategy createStrategy(PDDocument doc);
+    CropStrategy createStrategy(PDDocument doc);
 }

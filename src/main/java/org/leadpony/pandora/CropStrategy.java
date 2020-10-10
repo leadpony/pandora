@@ -24,17 +24,23 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
  *
  * @author leadpony
  */
-interface CroppingStrategy {
+interface CropStrategy {
 
     /**
      * The strategy using the bounding box of the page.
      */
-    CroppingStrategy BOUNDING_BOX_STRATEGY = new BoundsCroppingStrategy();
+    CropStrategy BOUNDING_BOX_STRATEGY = new BoundsCropStrategy();
 
     /**
      * The strategy using the bounding box of the texts in the page.
      */
-    CroppingStrategy TEXT_BOUNDING_BOX_STRATEGY = new BoundsCroppingStrategy(TextBoundingBoxFinder::new);
+    CropStrategy TEXT_BOUNDING_BOX_STRATEGY = new BoundsCropStrategy() {
+
+        @Override
+        protected BoundingBoxFinder createBoundingBoxFinder(PDPage page) {
+            return new TextBoundingBoxFinder(page);
+        }
+    };
 
     /**
      * Calculates the crop box of the page.

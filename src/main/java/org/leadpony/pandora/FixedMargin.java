@@ -66,8 +66,8 @@ class FixedMargin implements Margin {
     }
 
     @Override
-    public CroppingStrategy createStrategy(PDDocument doc) {
-        return new FixedCroppingStrategy(this);
+    public CropStrategy createStrategy(PDDocument doc) {
+        return new FixedCropStrategy(this);
     }
 
     private static Length createLength(String value) {
@@ -103,11 +103,11 @@ class FixedMargin implements Margin {
         }
     }
 
-    private static class FixedCroppingStrategy implements CroppingStrategy {
+    private static class FixedCropStrategy implements CropStrategy {
 
         private final FixedMargin margin;
 
-        FixedCroppingStrategy(FixedMargin margin) {
+        FixedCropStrategy(FixedMargin margin) {
             this.margin = margin;
         }
 
