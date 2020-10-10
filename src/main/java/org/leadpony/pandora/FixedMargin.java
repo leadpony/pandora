@@ -65,9 +65,44 @@ class FixedMargin implements Margin {
         this.left = entries.get(3);
     }
 
+    private FixedMargin(Length top, Length right, Length bottom, Length left) {
+        this.top = top;
+        this.right = right;
+        this.bottom = bottom;
+        this.left = left;
+    }
+
     @Override
     public CropStrategy createStrategy(PDDocument doc) {
         return new FixedCropStrategy(this);
+    }
+
+    @Override
+    public CropStrategy createStrategy(PDDocument doc, boolean flipping) {
+        if (flipping) {
+            return new FlippingCropStrategy(this);
+        }
+        return createStrategy(doc);
+    }
+
+    PDRectangle getCropBox(PDPage page) {
+        PDRectangle rect = page.getMediaBox();
+
+        final float top = this.top.apply(rect.getHeight());
+        final float right = this.right.apply(rect.getWidth());
+        final float bottom = this.bottom.apply(rect.getHeight());
+        final float left = this.left.apply(rect.getWidth());
+
+        final float x = rect.getLowerLeftX() + left;
+        final float y = rect.getLowerLeftY() + bottom;
+        final float width = rect.getWidth() - (left + right);
+        final float height = rect.getHeight() - (top + bottom);
+
+        return new PDRectangle(x, y, width, height);
+    }
+
+    FixedMargin flip() {
+        return new FixedMargin(top, right, bottom, left);
     }
 
     private static Length createLength(String value) {
@@ -103,7 +138,7 @@ class FixedMargin implements Margin {
         }
     }
 
-    private static class FixedCropStrategy implements CropStrategy {
+    static class FixedCropStrategy implements CropStrategy {
 
         private final FixedMargin margin;
 
@@ -113,19 +148,25 @@ class FixedMargin implements Margin {
 
         @Override
         public PDRectangle getCropBox(PDPage page) {
-            PDRectangle rect = page.getMediaBox();
+            return margin.getCropBox(page);
+        }
+    }
 
-            final float top = margin.top.apply(rect.getHeight());
-            final float right = margin.right.apply(rect.getWidth());
-            final float bottom = margin.bottom.apply(rect.getHeight());
-            final float left = margin.left.apply(rect.getWidth());
+    static class FlippingCropStrategy extends FixedCropStrategy {
 
-            final float x = rect.getLowerLeftX() + left;
-            final float y = rect.getLowerLeftY() + bottom;
-            final float width = rect.getWidth() - (left + right);
-            final float height = rect.getHeight() - (top + bottom);
+        private final FixedMargin flippedMargin;
+        private boolean flipped;
 
-            return new PDRectangle(x, y, width, height);
+        FlippingCropStrategy(FixedMargin margin) {
+            super(margin);
+            this.flippedMargin = margin.flip();
+        }
+
+        @Override
+        public PDRectangle getCropBox(PDPage page) {
+            PDRectangle cropBox = flipped ? flippedMargin.getCropBox(page) : super.getCropBox(page);
+            flipped = !flipped;
+            return cropBox;
         }
     }
 }

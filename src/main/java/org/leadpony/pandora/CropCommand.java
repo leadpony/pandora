@@ -29,26 +29,22 @@ import picocli.CommandLine.Option;
 @Command(name = "crop", description = "Assigns crop box to the PDF")
 class CropCommand extends AbstractCommand {
 
-    @Option(names = {"-m", "--margin"},
-            paramLabel = "<top,right,bottom,left> or \"bbox\"",
-            description = {
-               "margin each specified by 1/72 inch or %%",
-               "\"bbox\" means bounding box of the page",
-               "\"text-bbox\" means bounding box of the texts in the page",
-            },
-            required = true
-            )
+    @Option(names = { "-m", "--margin" }, paramLabel = "<top,right,bottom,left> or \"bbox\"", description = {
+            "margin each specified by 1/72 inch or %%", "\"bbox\" means bounding box of the page",
+            "\"text-bbox\" means bounding box of the texts in the page", }, required = true)
     private Margin margin;
 
-    @Option(names = "--preserve-aspect",
-            description = "preserve the aspect ratio of the page")
+    @Option(names = "--preserve-aspect", description = "preserve the aspect ratio of the page")
     private boolean preserveAspect;
+
+    @Option(names = "--flip", description = "flip the margin")
+    private boolean flip;
 
     private CropStrategy strategy;
 
     @Override
     protected void beginProcessing(PDDocument doc) {
-        this.strategy = margin.createStrategy(doc);
+        this.strategy = margin.createStrategy(doc, this.flip);
     }
 
     @Override

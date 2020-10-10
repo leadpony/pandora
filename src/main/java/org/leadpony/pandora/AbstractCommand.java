@@ -103,7 +103,7 @@ abstract class AbstractCommand implements Callable<Integer> {
     protected abstract void processPage(PDPage page);
 
     protected String getDefaultOutputSuffix() {
-        return "new";
+        return "converted";
     }
 
     private static PDDocument load(Path path) throws IOException {
