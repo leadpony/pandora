@@ -28,6 +28,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 interface Margin {
 
     Margin BOUNDING_BOX_MARGIN = doc -> CroppingStrategy.BOUNDING_BOX_STRATEGY;
+    Margin TEXT_BOUNDING_BOX_MARGIN = doc -> CroppingStrategy.TEXT_BOUNDING_BOX_STRATEGY;
 
     /**
      * Creates an instance of Margin from the specified string value.
@@ -39,6 +40,8 @@ interface Margin {
         Objects.requireNonNull(value, "value must not be null.");
         if ("bbox".equalsIgnoreCase(value)) {
             return BOUNDING_BOX_MARGIN;
+        } else if ("text-bbox".equalsIgnoreCase(value)) {
+            return TEXT_BOUNDING_BOX_MARGIN;
         }
         return FixedMargin.valueOf(value);
     }

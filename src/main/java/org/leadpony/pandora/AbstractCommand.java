@@ -40,31 +40,22 @@ abstract class AbstractCommand implements Callable<Integer> {
     private static final IntPredicate EVEN_ONLY = page -> (page % 2) == 0;
     private static final IntPredicate ODD_ONLY = page -> (page % 2) != 0;
 
-    @Parameters(index = "0",
-            description = "path to the original PDF")
+    @Parameters(index = "0", description = "path to the original PDF")
     private Path input;
 
-    @Option(names = {"-o", "--output"},
-            description = "path to the modified PDF",
-            required = true)
+    @Option(names = { "-o", "--output" }, description = "path to the modified PDF")
     private Path output;
 
-    @Option(names = "--pages",
-            paramLabel = "<page|range(,page|range)*>",
-            description = {
-                "pages or page ranges delimited by comma",
-                "ranges are specified by the form <start page number>:<end page nubmer>,",
-                "both limits are inclusive",
-                "page number starts from 1 and -1 denotes the final page of the document"
-            })
+    @Option(names = "--pages", paramLabel = "<page|range(,page|range)*>", description = {
+            "pages or page ranges delimited by comma",
+            "ranges are specified by the form <start page number>:<end page nubmer>,", "both limits are inclusive",
+            "page number starts from 1 and -1 denotes the final page of the document" })
     private Pages pages = Pages.all();
 
-    @Option(names = "--even",
-            description = "even pages only")
+    @Option(names = "--even", description = "even pages only")
     private boolean even = false;
 
-    @Option(names = "--odd",
-            description = "odd pages only")
+    @Option(names = "--odd", description = "odd pages only")
     private boolean odd = false;
 
     /**
@@ -77,7 +68,7 @@ abstract class AbstractCommand implements Callable<Integer> {
     public Integer call() throws Exception {
         try (PDDocument doc = load(input)) {
             processDoc(doc);
-            save(doc, output);
+            save(doc);
         } catch (Exception e) {
             e.printStackTrace(System.err);
             return 1;
@@ -111,14 +102,18 @@ abstract class AbstractCommand implements Callable<Integer> {
      */
     protected abstract void processPage(PDPage page);
 
+    protected String getDefaultOutputSuffix() {
+        return "new";
+    }
+
     private static PDDocument load(Path path) throws IOException {
         try (InputStream input = Files.newInputStream(path)) {
             return PDDocument.load(input);
         }
     }
 
-    private static void save(PDDocument doc, Path path) throws IOException {
-        try (OutputStream output = Files.newOutputStream(path)) {
+    private void save(PDDocument doc) throws IOException {
+        try (OutputStream output = Files.newOutputStream(getOutput())) {
             doc.save(output);
         }
     }
@@ -132,5 +127,25 @@ abstract class AbstractCommand implements Callable<Integer> {
             p = p.and(ODD_ONLY);
         }
         return p;
+    }
+
+    private Path getOutput() {
+        if (this.output != null) {
+            return this.output;
+        }
+        StringBuilder builder = new StringBuilder();
+        String input = this.input.toString();
+        int index = input.lastIndexOf('.');
+        if (index < 0) {
+            builder.append(input);
+            builder.append('-');
+            builder.append(getDefaultOutputSuffix());
+        } else {
+            builder.append(input, 0, index);
+            builder.append('-');
+            builder.append(getDefaultOutputSuffix());
+            builder.append(input, index, input.length());
+        }
+        return Path.of(builder.toString());
     }
 }

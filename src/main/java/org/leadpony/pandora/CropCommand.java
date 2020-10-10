@@ -33,7 +33,8 @@ class CropCommand extends AbstractCommand {
             paramLabel = "<top,right,bottom,left> or \"bbox\"",
             description = {
                "margin each specified by 1/72 inch or %%",
-               "\"bbox\" means bounding box of the page"
+               "\"bbox\" means bounding box of the page",
+               "\"text-bbox\" means bounding box of the texts in the page",
             },
             required = true
             )

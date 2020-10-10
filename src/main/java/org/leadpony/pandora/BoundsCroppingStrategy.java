@@ -19,6 +19,7 @@ package org.leadpony.pandora;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.function.Function;
 
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -30,9 +31,19 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
  */
 class BoundsCroppingStrategy implements CroppingStrategy {
 
+    private final Function<PDPage, BoundingBoxFinder> factory;
+
+    BoundsCroppingStrategy() {
+        this(BoundingBoxFinder::new);
+    }
+
+    BoundsCroppingStrategy(Function<PDPage, BoundingBoxFinder> factory) {
+        this.factory = factory;
+    }
+
     @Override
     public PDRectangle getCropBox(PDPage page) {
-        BoundingBoxFinder finder = new BoundingBoxFinder(page);
+        BoundingBoxFinder finder = factory.apply(page);
         try {
             finder.processPage(page);
             Rectangle2D bbox = finder.getBoundingBox();

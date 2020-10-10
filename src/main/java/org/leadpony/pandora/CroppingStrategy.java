@@ -32,6 +32,11 @@ interface CroppingStrategy {
     CroppingStrategy BOUNDING_BOX_STRATEGY = new BoundsCroppingStrategy();
 
     /**
+     * The strategy using the bounding box of the texts in the page.
+     */
+    CroppingStrategy TEXT_BOUNDING_BOX_STRATEGY = new BoundsCroppingStrategy(TextBoundingBoxFinder::new);
+
+    /**
      * Calculates the crop box of the page.
      *
      * @param page the page to crop.
