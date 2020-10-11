@@ -87,8 +87,9 @@ abstract class AbstractCommand implements Callable<Integer> {
         final int totalPages = doc.getNumberOfPages();
         IntPredicate predicate = getPagePredicate(totalPages);
         for (int i = 0; i < totalPages; i++) {
-            if (predicate.test(i + 1)) {
-                processPage(doc.getPage(i));
+            int pageNo = i + 1;
+            if (predicate.test(pageNo)) {
+                processPage(doc.getPage(i), pageNo);
             }
         }
     }
@@ -99,8 +100,9 @@ abstract class AbstractCommand implements Callable<Integer> {
      * Processes a page of the PDF document.
      *
      * @param page the page to process, never be {@code null}.
+     * @param pageNo the page number starting from 1.
      */
-    protected abstract void processPage(PDPage page);
+    protected abstract void processPage(PDPage page, int pageNo);
 
     protected String getDefaultOutputSuffix() {
         return "converted";

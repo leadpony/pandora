@@ -148,9 +148,9 @@ class BoundingBoxFinder extends PDFGraphicsStreamEngine {
     }
 
     @Override
-    protected void showGlyph(Matrix textRenderingMatrix, PDFont font, int code, String unicode, Vector displacement)
+    protected void showGlyph(Matrix textRenderingMatrix, PDFont font, int code, Vector displacement)
             throws IOException {
-        super.showGlyph(textRenderingMatrix, font, code, unicode, displacement);
+        super.showGlyph(textRenderingMatrix, font, code, displacement);
         Shape shape = calculateGlyphBounds(textRenderingMatrix, font, code);
         if (shape != null) {
             add(shape.getBounds2D());

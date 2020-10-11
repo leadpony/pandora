@@ -78,11 +78,8 @@ class FixedMargin implements Margin {
     }
 
     @Override
-    public CropStrategy createStrategy(PDDocument doc, boolean flipping) {
-        if (flipping) {
-            return new FlippingCropStrategy(this);
-        }
-        return createStrategy(doc);
+    public Margin flip() {
+        return new FixedMargin(top, left, bottom, right);
     }
 
     PDRectangle getCropBox(PDPage page) {
@@ -99,10 +96,6 @@ class FixedMargin implements Margin {
         final float height = rect.getHeight() - (top + bottom);
 
         return new PDRectangle(x, y, width, height);
-    }
-
-    FixedMargin flip() {
-        return new FixedMargin(top, right, bottom, left);
     }
 
     private static Length createLength(String value) {
@@ -123,6 +116,11 @@ class FixedMargin implements Margin {
 
         float apply(float fullLength) {
             return value;
+        }
+
+        @Override
+        public String toString() {
+            return String.valueOf(this.value);
         }
     }
 
@@ -147,26 +145,8 @@ class FixedMargin implements Margin {
         }
 
         @Override
-        public PDRectangle getCropBox(PDPage page) {
+        public PDRectangle getCropBox(PDPage page, int pageNo) {
             return margin.getCropBox(page);
-        }
-    }
-
-    static class FlippingCropStrategy extends FixedCropStrategy {
-
-        private final FixedMargin flippedMargin;
-        private boolean flipped;
-
-        FlippingCropStrategy(FixedMargin margin) {
-            super(margin);
-            this.flippedMargin = margin.flip();
-        }
-
-        @Override
-        public PDRectangle getCropBox(PDPage page) {
-            PDRectangle cropBox = flipped ? flippedMargin.getCropBox(page) : super.getCropBox(page);
-            flipped = !flipped;
-            return cropBox;
         }
     }
 }

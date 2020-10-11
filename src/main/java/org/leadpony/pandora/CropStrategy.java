@@ -46,7 +46,8 @@ interface CropStrategy {
      * Calculates the crop box of the page.
      *
      * @param page the page to crop.
+     * @param pageNo the page number starting from 1.
      * @return the crop box calculated, must not be {@code null}.
      */
-    PDRectangle getCropBox(PDPage page);
+    PDRectangle getCropBox(PDPage page, int pageNo);
 }

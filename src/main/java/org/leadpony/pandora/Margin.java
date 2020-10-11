@@ -54,14 +54,7 @@ interface Margin {
      */
     CropStrategy createStrategy(PDDocument doc);
 
-    /**
-     * Creates a cropping strategy for this margin.
-     *
-     * @param doc the document to crop.
-     * @param flipping flip the margin.
-     * @return newly created instance of cropping strategy.
-     */
-    default CropStrategy createStrategy(PDDocument doc, boolean flipping) {
-        return createStrategy(doc);
+    default Margin flip() {
+        return this;
     }
 }

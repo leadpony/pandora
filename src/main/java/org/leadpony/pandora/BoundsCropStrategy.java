@@ -31,7 +31,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 class BoundsCropStrategy implements CropStrategy {
 
     @Override
-    public PDRectangle getCropBox(PDPage page) {
+    public PDRectangle getCropBox(PDPage page, int pageNo) {
         BoundingBoxFinder finder = createBoundingBoxFinder(page);
         try {
             finder.processPage(page);

@@ -16,6 +16,10 @@
 
 package org.leadpony.pandora;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -32,25 +36,38 @@ class CropCommand extends AbstractCommand {
     @Option(names = { "-m", "--margin" }, paramLabel = "<top,right,bottom,left> or \"bbox\"", description = {
             "margin each specified by 1/72 inch or %%", "\"bbox\" means bounding box of the page",
             "\"text-bbox\" means bounding box of the texts in the page", }, required = true)
-    private Margin margin;
+    private List<Margin> margin;
 
     @Option(names = "--preserve-aspect", description = "preserve the aspect ratio of the page")
     private boolean preserveAspect;
 
-    @Option(names = "--flip", description = "flip the margin")
+    @Option(names = "--flip", description = "flip the margin, page by page")
     private boolean flip;
 
     private CropStrategy strategy;
 
     @Override
     protected void beginProcessing(PDDocument doc) {
-        this.strategy = margin.createStrategy(doc, this.flip);
+        List<Margin> margins = new ArrayList<>(this.margin);
+        if (margins.size() == 1 && this.flip) {
+            margins.add(margins.get(0).flip());
+        }
+
+        List<CropStrategy> strategies = margins.stream()
+                .map(margin -> margin.createStrategy(doc))
+                .collect(Collectors.toList());
+
+        if (strategies.size() == 1) {
+            this.strategy = strategies.get(0);
+        } else {
+            this.strategy = new FlippingCropStrategy(strategies);
+        }
     }
 
     @Override
-    protected void processPage(PDPage page) {
+    protected void processPage(PDPage page, int pageNo) {
         PDRectangle mediaBox = page.getMediaBox();
-        PDRectangle cropBox = strategy.getCropBox(page);
+        PDRectangle cropBox = strategy.getCropBox(page, pageNo);
         if (preserveAspect) {
             cropBox = adjustBox(cropBox, mediaBox);
         }
