@@ -72,7 +72,7 @@ class Pages {
     }
 
     private static PageRange range(String value) {
-        String[] tokens = value.trim().split("\\s*:\\s*");
+        String[] tokens = value.trim().split("\\s*:\\s*", -1);
         if (tokens.length > 2) {
             throw new IllegalArgumentException();
         }
