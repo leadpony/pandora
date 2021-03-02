@@ -60,11 +60,14 @@ import org.apache.pdfbox.util.Vector;
  */
 class BoundingBoxFinder extends PDFGraphicsStreamEngine {
 
+    private final PDRectangle mediaBox;
+
     private Rectangle2D boundingBox;
     private Rectangle2D pathRect;
 
     BoundingBoxFinder(PDPage page) {
         super(page);
+        mediaBox = page.getMediaBox();
     }
 
     /**
@@ -252,6 +255,10 @@ class BoundingBoxFinder extends PDFGraphicsStreamEngine {
     }
 
     private void add(Rectangle2D rect) {
+        if (!isVisible(rect)) {
+            return;
+        }
+
         if (boundingBox == null) {
             boundingBox = new Rectangle2D.Double();
             boundingBox.setRect(rect);
@@ -270,5 +277,12 @@ class BoundingBoxFinder extends PDFGraphicsStreamEngine {
         } else {
             boundingBox.add(x,  y);
         }
+    }
+
+    private boolean isVisible(Rectangle2D rect) {
+        return (rect.getMinX() <= mediaBox.getUpperRightX()
+                && rect.getMaxX() >= mediaBox.getLowerLeftX()
+                && rect.getMinY() <= mediaBox.getUpperRightY()
+                && rect.getMaxY() >= mediaBox.getLowerLeftY());
     }
 }
