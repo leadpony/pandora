@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,9 @@ class CropCommand extends AbstractCommand {
     @Option(names = "--flip", description = "flip the margin, page by page")
     private boolean flip;
 
+    @Option(names = "--padding", description = "padding in 1/72, default is 0", defaultValue = "0")
+    private int padding = 0;
+
     private CropStrategy strategy;
 
     @Override
@@ -68,9 +71,11 @@ class CropCommand extends AbstractCommand {
     protected void processPage(PDPage page, int pageNo) {
         PDRectangle mediaBox = page.getMediaBox();
         PDRectangle cropBox = strategy.getCropBox(page, pageNo);
+        pad(cropBox);
         if (preserveAspect) {
             cropBox = adjustBox(cropBox, mediaBox);
         }
+        clip(cropBox, mediaBox);
         page.setCropBox(cropBox);
     }
 
@@ -91,5 +96,35 @@ class CropCommand extends AbstractCommand {
             return new PDRectangle(box.getLowerLeftX(), y, box.getWidth(), height);
         }
         return box;
+    }
+
+    private void pad(PDRectangle rect) {
+        final int padding = this.padding;
+        if (padding > 0) {
+            rect.setLowerLeftX(rect.getLowerLeftX() - padding);
+            rect.setUpperRightX(rect.getUpperRightX() + padding);
+            rect.setLowerLeftY(rect.getLowerLeftY() - padding);
+            rect.setUpperRightY(rect.getUpperRightY() + padding);
+        }
+    }
+
+    private static void clip(PDRectangle rect, PDRectangle mediaBox) {
+        float minX = rect.getLowerLeftX();
+        float maxX = rect.getUpperRightX();
+        float minY = rect.getLowerLeftY();
+        float maxY = rect.getUpperRightY();
+
+        if (minX < mediaBox.getLowerLeftX()) {
+            rect.setLowerLeftX(mediaBox.getLowerLeftX());
+        }
+        if (maxX > mediaBox.getUpperRightX()) {
+            rect.setUpperRightX(mediaBox.getUpperRightX());
+        }
+        if (minY < mediaBox.getLowerLeftY()) {
+            rect.setLowerLeftY(mediaBox.getLowerLeftY());
+        }
+        if (maxY > mediaBox.getUpperRightY()) {
+            rect.setUpperRightY(mediaBox.getUpperRightY());
+        }
     }
 }
