@@ -33,19 +33,22 @@ import picocli.CommandLine.Option;
 @Command(name = "crop", description = "Assigns crop box to the PDF")
 class CropCommand extends AbstractCommand {
 
-    @Option(names = { "-m", "--margin" }, paramLabel = "<top,right,bottom,left> or \"bbox\"", description = {
+    @Option(names = { "-m", "--margin" }, paramLabel = "<top,right,bottom,left>, \"bbox\", or \"text-bbox\"", description = {
             "margin each specified by 1/72 inch or %%", "\"bbox\" means bounding box of the page",
             "\"text-bbox\" means bounding box of the texts in the page", }, required = true)
     private List<Margin> margin;
 
-    @Option(names = "--preserve-aspect", description = "preserve the aspect ratio of the page")
+    @Option(names = "--preserve-aspect", description = "preserve the original aspect ratio of the page")
     private boolean preserveAspect;
 
     @Option(names = "--flip", description = "flip the margin, page by page")
     private boolean flip;
 
-    @Option(names = "--padding", description = "padding in 1/72, default is 0", defaultValue = "0")
+    @Option(names = "--padding", description = "padding size in 1/72 inch, default is 0", defaultValue = "0")
     private int padding = 0;
+
+    @Option(names = "--aspect", paramLabel = "<numeric value or paper size name>", description = "page aspect ratio")
+    private Aspect aspect;
 
     private CropStrategy strategy;
 
@@ -71,20 +74,22 @@ class CropCommand extends AbstractCommand {
     protected void processPage(PDPage page, int pageNo) {
         PDRectangle mediaBox = page.getMediaBox();
         PDRectangle cropBox = strategy.getCropBox(page, pageNo);
-        pad(cropBox);
+        addPaddingToBox(cropBox);
         if (preserveAspect) {
-            cropBox = adjustBox(cropBox, mediaBox);
+            cropBox = adjustBoxAspect(cropBox, mediaBox);
+        } else if (aspect != null) {
+            cropBox = adjustBoxAspect(cropBox, aspect.getValue());
         }
-        clip(cropBox, mediaBox);
+        clipBox(cropBox, mediaBox);
         page.setCropBox(cropBox);
     }
 
-    private static PDRectangle adjustBox(PDRectangle box, PDRectangle page) {
+    private static PDRectangle adjustBoxAspect(PDRectangle box, PDRectangle page) {
         float aspectRatio = page.getWidth() / page.getHeight();
-        return adjustBox(box, aspectRatio);
+        return adjustBoxAspect(box, aspectRatio);
     }
 
-    private static PDRectangle adjustBox(PDRectangle box, float aspectRatio) {
+    private static PDRectangle adjustBoxAspect(PDRectangle box, float aspectRatio) {
         final float newAspectRatio = box.getWidth() / box.getHeight();
         if (newAspectRatio < aspectRatio) {
             float width = box.getHeight() * aspectRatio;
@@ -98,33 +103,33 @@ class CropCommand extends AbstractCommand {
         return box;
     }
 
-    private void pad(PDRectangle rect) {
+    private void addPaddingToBox(PDRectangle box) {
         final int padding = this.padding;
         if (padding > 0) {
-            rect.setLowerLeftX(rect.getLowerLeftX() - padding);
-            rect.setUpperRightX(rect.getUpperRightX() + padding);
-            rect.setLowerLeftY(rect.getLowerLeftY() - padding);
-            rect.setUpperRightY(rect.getUpperRightY() + padding);
+            box.setLowerLeftX(box.getLowerLeftX() - padding);
+            box.setUpperRightX(box.getUpperRightX() + padding);
+            box.setLowerLeftY(box.getLowerLeftY() - padding);
+            box.setUpperRightY(box.getUpperRightY() + padding);
         }
     }
 
-    private static void clip(PDRectangle rect, PDRectangle mediaBox) {
-        float minX = rect.getLowerLeftX();
-        float maxX = rect.getUpperRightX();
-        float minY = rect.getLowerLeftY();
-        float maxY = rect.getUpperRightY();
+    private static void clipBox(PDRectangle box, PDRectangle mediaBox) {
+        float minX = box.getLowerLeftX();
+        float maxX = box.getUpperRightX();
+        float minY = box.getLowerLeftY();
+        float maxY = box.getUpperRightY();
 
         if (minX < mediaBox.getLowerLeftX()) {
-            rect.setLowerLeftX(mediaBox.getLowerLeftX());
+            box.setLowerLeftX(mediaBox.getLowerLeftX());
         }
         if (maxX > mediaBox.getUpperRightX()) {
-            rect.setUpperRightX(mediaBox.getUpperRightX());
+            box.setUpperRightX(mediaBox.getUpperRightX());
         }
         if (minY < mediaBox.getLowerLeftY()) {
-            rect.setLowerLeftY(mediaBox.getLowerLeftY());
+            box.setLowerLeftY(mediaBox.getLowerLeftY());
         }
         if (maxY > mediaBox.getUpperRightY()) {
-            rect.setUpperRightY(mediaBox.getUpperRightY());
+            box.setUpperRightY(mediaBox.getUpperRightY());
         }
     }
 }
