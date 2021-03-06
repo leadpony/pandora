@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,16 +30,22 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
  */
 class BoundsCropStrategy implements CropStrategy {
 
+    private final float padding;
+
+    BoundsCropStrategy(CroppingContext context) {
+        this.padding = context.getPadding();
+    }
+
     @Override
     public PDRectangle getCropBox(PDPage page, int pageNo) {
         BoundingBoxFinder finder = createBoundingBoxFinder(page);
         try {
             finder.processPage(page);
-            Rectangle2D bbox = finder.getBoundingBox();
-            if (bbox == null) {
+            Rectangle2D box = finder.getBoundingBox();
+            if (box == null) {
                 return page.getMediaBox();
             }
-            return rectangleFrom(bbox);
+            return rectangleFrom(box, this.padding);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -49,9 +55,19 @@ class BoundsCropStrategy implements CropStrategy {
         return new BoundingBoxFinder(page);
     }
 
-    private static PDRectangle rectangleFrom(Rectangle2D rect) {
-        return new PDRectangle(
-                (float) rect.getMinX(), (float) rect.getMinY(),
-                (float) rect.getWidth(), (float) rect.getHeight());
+    private static PDRectangle rectangleFrom(Rectangle2D box, float padding) {
+        float minX = (float) box.getMinX();
+        float minY = (float) box.getMinY();
+        float maxX = (float) box.getMaxX();
+        float maxY = (float) box.getMaxY();
+
+        if (padding > 0) {
+            minX -= padding;
+            minY -= padding;
+            maxX += padding;
+            maxY += padding;
+        }
+
+        return new PDRectangle(minX, minY, maxX - minX, maxY - minY);
     }
 }

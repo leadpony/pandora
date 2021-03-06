@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,17 @@
 
 package org.leadpony.pandora;
 
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-
 /**
- * A strategy for cropping pages.
+ * A context for cropping pages.
  *
  * @author leadpony
  */
-interface CropStrategy {
+interface CroppingContext {
 
     /**
-     * Calculates the crop box of the page.
+     * Returns the padding size for bounding box.
      *
-     * @param page the page to crop.
-     * @param pageNo the page number starting from 1.
-     * @return the crop box calculated, must not be {@code null}.
+     * @return the padding size for bounding box.
      */
-    PDRectangle getCropBox(PDPage page, int pageNo);
+    int getPadding();
 }

@@ -31,11 +31,16 @@ import picocli.CommandLine.Option;
  * @author leadpony
  */
 @Command(name = "crop", description = "Assigns crop box to the PDF")
-class CropCommand extends AbstractCommand {
+class CropCommand extends AbstractCommand implements CroppingContext {
 
-    @Option(names = { "-m", "--margin" }, paramLabel = "<top,right,bottom,left>, \"bbox\", or \"text-bbox\"", description = {
-            "margin each specified by 1/72 inch or %%", "\"bbox\" means bounding box of the page",
-            "\"text-bbox\" means bounding box of the texts in the page", }, required = true)
+    @Option(names = { "-m", "--margin" }, paramLabel = "<top,right,bottom,left>, \"bbox\", or \"text-bbox\"",
+            description = {
+                "margin each specified by 1/72 inch or %%",
+                "\"bbox\" means bounding box of the page",
+                "\"text-bbox\" means bounding box of the texts in the page",
+                "the default is \"bbox\""
+            },
+            required = true, defaultValue = "bbox")
     private List<Margin> margin;
 
     @Option(names = "--preserve-aspect", description = "preserve the original aspect ratio of the page")
@@ -44,13 +49,18 @@ class CropCommand extends AbstractCommand {
     @Option(names = "--flip", description = "flip the margin, page by page")
     private boolean flip;
 
-    @Option(names = "--padding", description = "padding size in 1/72 inch, default is 0", defaultValue = "0")
-    private int padding = 0;
+    @Option(names = "--padding", description = "padding size in 1/72 inch used for bounding box, default is 5", defaultValue = "5")
+    private int padding = 5;
 
     @Option(names = "--aspect", paramLabel = "<numeric value or paper size name>", description = "page aspect ratio")
     private Aspect aspect;
 
     private CropStrategy strategy;
+
+    @Override
+    public int getPadding() {
+        return padding;
+    }
 
     @Override
     protected void beginProcessing(PDDocument doc) {
@@ -60,7 +70,7 @@ class CropCommand extends AbstractCommand {
         }
 
         List<CropStrategy> strategies = margins.stream()
-                .map(margin -> margin.createStrategy(doc))
+                .map(margin -> margin.createStrategy(doc, this))
                 .collect(Collectors.toList());
 
         if (strategies.size() == 1) {
@@ -74,7 +84,6 @@ class CropCommand extends AbstractCommand {
     protected void processPage(PDPage page, int pageNo) {
         PDRectangle mediaBox = page.getMediaBox();
         PDRectangle cropBox = strategy.getCropBox(page, pageNo);
-        addPaddingToBox(cropBox);
         if (preserveAspect) {
             cropBox = adjustBoxAspect(cropBox, mediaBox);
         } else if (aspect != null) {
@@ -101,16 +110,6 @@ class CropCommand extends AbstractCommand {
             return new PDRectangle(box.getLowerLeftX(), y, box.getWidth(), height);
         }
         return box;
-    }
-
-    private void addPaddingToBox(PDRectangle box) {
-        final int padding = this.padding;
-        if (padding > 0) {
-            box.setLowerLeftX(box.getLowerLeftX() - padding);
-            box.setUpperRightX(box.getUpperRightX() + padding);
-            box.setLowerLeftY(box.getLowerLeftY() - padding);
-            box.setUpperRightY(box.getUpperRightY() + padding);
-        }
     }
 
     private static void clipBox(PDRectangle box, PDRectangle mediaBox) {

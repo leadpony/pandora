@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.leadpony.pandora;
 import java.util.Objects;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
 
 /**
  * A margin option.
@@ -27,8 +28,14 @@ import org.apache.pdfbox.pdmodel.PDDocument;
  */
 interface Margin {
 
-    Margin BOUNDING_BOX_MARGIN = doc -> CropStrategy.BOUNDING_BOX_STRATEGY;
-    Margin TEXT_BOUNDING_BOX_MARGIN = doc -> CropStrategy.TEXT_BOUNDING_BOX_STRATEGY;
+    Margin BOUNDING_BOX_MARGIN = (doc, context) -> new BoundsCropStrategy(context);
+
+    Margin TEXT_BOUNDING_BOX_MARGIN = (doc, context) -> new BoundsCropStrategy(context) {
+        @Override
+        protected BoundingBoxFinder createBoundingBoxFinder(PDPage page) {
+            return new TextBoundingBoxFinder(page);
+        }
+    };
 
     /**
      * Creates an instance of Margin from the specified string value.
@@ -47,12 +54,13 @@ interface Margin {
     }
 
     /**
-     * Creates a cropping strategy for this margin.
+     * Creates a cropping strategy for this margin configuration.
      *
-     * @param doc the document to crop.
+     * @param doc the PDF document to be cropped.
+     * @param context the context for cropping pages.
      * @return newly created instance of cropping strategy.
      */
-    CropStrategy createStrategy(PDDocument doc);
+    CropStrategy createStrategy(PDDocument doc, CroppingContext context);
 
     default Margin flip() {
         return this;
