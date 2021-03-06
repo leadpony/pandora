@@ -20,6 +20,7 @@ package org.leadpony.pandora;
  * Paper size.
  */
 enum PaperSize {
+    A3(297, 420),
     A4(210, 297),
     A5(148, 210);
 
@@ -31,15 +32,15 @@ enum PaperSize {
         this.height = height;
     }
 
-    int getWidth() {
+    int width() {
         return width;
     }
 
-    int getHeight() {
+    int height() {
         return height;
     }
 
-    float getAspectRatio() {
+    float aspectRatio() {
         return (float) width / (float) height;
     }
 }

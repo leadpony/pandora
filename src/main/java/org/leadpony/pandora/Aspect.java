@@ -15,6 +15,9 @@
  */
 package org.leadpony.pandora;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Page aspect ratio.
  *
@@ -22,6 +25,9 @@ package org.leadpony.pandora;
  */
 class Aspect {
     private final float value;
+
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+(\\.\\d+)");
+    private static final Pattern RATIO_PATTERN = Pattern.compile("(\\d+):(\\d+)");
 
     private Aspect(float value) {
         this.value = value;
@@ -32,12 +38,20 @@ class Aspect {
     }
 
     static Aspect valueOf(String value) {
-        try {
-            PaperSize paperSize = PaperSize.valueOf(value.toUpperCase());
-            return valueOf(paperSize.getAspectRatio());
-        } catch (IllegalArgumentException e) {
+        Matcher m = NUMBER_PATTERN.matcher(value);
+        if (m.matches()) {
             return valueOf(Float.valueOf(value));
         }
+
+        m = RATIO_PATTERN.matcher(value);
+        if (m.matches()) {
+            float w = Float.valueOf(m.group(1));
+            float h = Float.valueOf(m.group(2));
+            return valueOf(w / h);
+        }
+
+        PaperSize paperSize = PaperSize.valueOf(value.toUpperCase());
+        return valueOf(paperSize.aspectRatio());
     }
 
     static Aspect valueOf(float value) {
