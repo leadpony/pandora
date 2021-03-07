@@ -65,8 +65,9 @@ class CropCommand extends AbstractCommand implements CroppingContext {
             description = {
                     "Page aspect ratio to be forced.",
                     "e.g. 0.75, \"3:4\", \"a4\""
-            })
-    private Aspect aspect;
+            },
+            converter = AspectConverter.class)
+    private Float aspect;
 
     private CropStrategy strategy;
 
@@ -100,7 +101,7 @@ class CropCommand extends AbstractCommand implements CroppingContext {
         if (preserveAspect) {
             cropBox = adjustBoxAspect(cropBox, mediaBox);
         } else if (aspect != null) {
-            cropBox = adjustBoxAspect(cropBox, aspect.getValue());
+            cropBox = adjustBoxAspect(cropBox, aspect);
         }
         clipBox(cropBox, mediaBox);
         page.setCropBox(cropBox);

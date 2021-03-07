@@ -13,48 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.leadpony.pandora;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import picocli.CommandLine.ITypeConverter;
+
 /**
- * Page aspect ratio.
+ * A converter for {@code --aspect} option.
  *
  * @author leadpony
  */
-class Aspect {
-    private final float value;
+public class AspectConverter implements ITypeConverter<Float> {
 
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+(\\.\\d+)");
     private static final Pattern RATIO_PATTERN = Pattern.compile("(\\d+):(\\d+)");
 
-    private Aspect(float value) {
-        this.value = value;
-    }
-
-    float getValue() {
-        return value;
-    }
-
-    static Aspect valueOf(String value) {
+    @Override
+    public Float convert(String value) {
         Matcher m = NUMBER_PATTERN.matcher(value);
         if (m.matches()) {
-            return valueOf(Float.valueOf(value));
+            return Float.valueOf(value);
         }
 
         m = RATIO_PATTERN.matcher(value);
         if (m.matches()) {
             float w = Float.valueOf(m.group(1));
             float h = Float.valueOf(m.group(2));
-            return valueOf(w / h);
+            return w / h;
         }
 
         PaperSize paperSize = PaperSize.valueOf(value.toUpperCase());
-        return valueOf(paperSize.aspectRatio());
-    }
-
-    static Aspect valueOf(float value) {
-        return new Aspect(value);
+        return paperSize.aspectRatio();
     }
 }

@@ -20,7 +20,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class AspectTest {
+public class AspectConverterTest {
 
     public enum TestCase {
         SINGLE_NUMBER("0.75", 0.75f),
@@ -40,7 +40,8 @@ public class AspectTest {
     @ParameterizedTest
     @EnumSource(TestCase.class)
     public void test(TestCase test) {
-        Aspect aspect = Aspect.valueOf(test.value);
-        assertThat(aspect.getValue()).isEqualTo(test.expected);
+        AspectConverter sut = new AspectConverter();
+        float actual = sut.convert(test.value);
+        assertThat(actual).isEqualTo(test.expected);
     }
 }
