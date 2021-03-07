@@ -65,27 +65,42 @@ class Pages {
         List<PageRange> ranges = new ArrayList<>();
         for (String token : tokens) {
             if (!token.isEmpty()) {
-                ranges.add(range(token));
+                ranges.add(parseRange(token));
             }
         }
         return new Pages(ranges);
     }
 
-    private static PageRange range(String value) {
-        String[] tokens = value.trim().split("\\s*:\\s*", -1);
+    /**
+     * Parses a range into a {@code PageRange} instance.
+     *
+     * @param value the string to be parsed, which is already trimmed.
+     * @return a newly created instance of {@code PageRange}.
+     */
+    private static PageRange parseRange(String value) {
+        String[] tokens = value.trim().split("\\s*-\\s*", -1);
         if (tokens.length > 2) {
             throw new IllegalArgumentException();
         }
-
         if (tokens.length == 1) {
-            return new Single(Integer.valueOf(value));
+            return new Single(parsePageNumber(value, 1));
         } else {
-            int first = tokens[0].isEmpty()
-                    ? 1 : Integer.valueOf(tokens[0]);
-            int last = tokens[1].isEmpty()
-                    ? -1 : Integer.valueOf(tokens[1]);
+            int first = parsePageNumber(tokens[0], 1);
+            int last = parsePageNumber(tokens[1], -1);
             return new Bounded(first, last);
         }
+    }
+
+    private static int parsePageNumber(String value, int defaultValue) {
+        if (value.isEmpty()) {
+            return defaultValue;
+        }
+        int sign =  1;
+        if (value.startsWith("b")) {
+            sign = -1;
+            value = value.substring(1);
+        }
+        return sign * Integer.valueOf(value);
     }
 
     private interface PageRange extends IntPredicate {

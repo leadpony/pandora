@@ -33,26 +33,39 @@ import picocli.CommandLine.Option;
 @Command(name = "crop", description = "Assigns crop box to the PDF")
 class CropCommand extends AbstractCommand implements CroppingContext {
 
-    @Option(names = { "-m", "--margin" }, paramLabel = "<top,right,bottom,left>, \"bbox\", or \"text-bbox\"",
+    @Option(names = { "-m", "--margin" },
+            paramLabel = "<top,right,bottom,left>, \"bbox\", or \"text-bbox\"",
             description = {
-                "margin each specified by 1/72 inch or %%",
-                "\"bbox\" means bounding box of the page",
-                "\"text-bbox\" means bounding box of the texts in the page",
-                "the default is \"bbox\""
+                "Each margin can be specified in 1/72 inch or %% unit.",
+                "Special value \"bbox\" means calculated bounding box of the page.",
+                "\"text-bbox\" means bounding box of the texts in the page.",
+                "(default value: \"bbox\")"
             },
-            required = true, defaultValue = "bbox")
+            defaultValue = "bbox")
     private List<Margin> margin;
 
-    @Option(names = "--preserve-aspect", description = "preserve the original aspect ratio of the page")
+    @Option(names = "--preserve-aspect",
+            description = "Preserve the original aspect ratio of pages.")
     private boolean preserveAspect;
 
-    @Option(names = "--flip", description = "flip the margin, page by page")
+    @Option(names = "--flip",
+            description = "Flip the margin, page by page.")
     private boolean flip;
 
-    @Option(names = "--padding", description = "padding size in 1/72 inch used for bounding box, default is 5", defaultValue = "5")
+    @Option(names = "--padding",
+            description = {
+                    "Padding size in 1/72 inch added to bounding boxes.",
+                    "(default value: 5)"
+            },
+            defaultValue = "5")
     private int padding = 5;
 
-    @Option(names = "--aspect", paramLabel = "<numeric value or paper size name>", description = "page aspect ratio")
+    @Option(names = {"-a", "--aspect"},
+            paramLabel = "<numeric value or paper size name>",
+            description = {
+                    "Page aspect ratio to be forced.",
+                    "e.g. 0.75, \"3:4\", \"a4\""
+            })
     private Aspect aspect;
 
     private CropStrategy strategy;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,22 +40,30 @@ abstract class AbstractCommand implements Callable<Integer> {
     private static final IntPredicate EVEN_ONLY = page -> (page % 2) == 0;
     private static final IntPredicate ODD_ONLY = page -> (page % 2) != 0;
 
-    @Parameters(index = "0", description = "path to the original PDF")
+    @Parameters(index = "0", description = "Path to the original PDF document.")
     private Path input;
 
-    @Option(names = { "-o", "--output" }, description = "path to the modified PDF")
+    @Option(names = { "-o", "--output" }, description = "Path to the converted PDF document.")
     private Path output;
 
-    @Option(names = "--pages", paramLabel = "<page|range(,page|range)*>", description = {
-            "pages or page ranges delimited by comma",
-            "ranges are specified by the form <start page number>:<end page nubmer>,", "both limits are inclusive",
-            "page number starts from 1 and -1 denotes the final page of the document" })
+    @Option(names = "--pages",
+            paramLabel = "<page|range(,page|range)*>",
+            description = {
+                "Pages or page ranges delimited by comma.",
+                "Each range is in the form <first page>-<last page>, ",
+                "both bounds are inclusive and one-indexed.",
+                "Page numbers can be prefixed with 'b'",
+                "when counted from the back cover."
+            }
+    )
     private Pages pages = Pages.all();
 
-    @Option(names = "--even", description = "even pages only")
+    @Option(names = "--even",
+            description = "Process only even pages.")
     private boolean even = false;
 
-    @Option(names = "--odd", description = "odd pages only")
+    @Option(names = "--odd",
+            description = "Process only odd pages.")
     private boolean odd = false;
 
     /**
