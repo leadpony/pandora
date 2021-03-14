@@ -376,35 +376,50 @@ code {
 </div></code></pre>
 <h2 id="commands">Commands</h2>
 <h3 id="crop">crop</h3>
-<p>Assigns crop box to the PDF.</p>
-<pre class="hljs"><code><div>pandora crop [--even] [--odd] [--preserve-aspect] -m=&lt;top,right,bottom,left&gt; or "bbox" -o=&lt;output&gt; [--pages=&lt;page|range(,page|range)*&gt;] &lt;input&gt;
+<p>Assigns a crop box to the PDF document.</p>
+<pre class="hljs"><code><div>pandora crop [--even] [--flip] [--odd] [--preserve-aspect] [-a=&lt;numeric value or paper size name&gt;] [-o=&lt;output&gt;] [--padding=&lt;padding&gt;] [--pages=&lt;page|range(,page|range)*&gt;] [-m=&lt;top,right,bottom,left&gt;, "bbox", or "text-bbox"]... &lt;input&gt;
 </div></code></pre>
+<h4 id="input">&lt;input&gt;</h4>
+<p>Path to the original PDF document.</p>
+<h4 id="a---aspectnumeric-value-or-paper-size-name">-a, --aspect=&lt;numeric value or paper size name&gt;</h4>
+<p>Page aspect ratio to be forced. e.g. <code>0.75</code>, <code>3:4</code>, <code>a4</code></p>
 <h4 id="even">--even</h4>
-<p>This option causes only <em>even</em> pages to be cropped.</p>
-<h4 id="m---margintoprightbottomleft-or-bbox">-m, --margin=&lt;top,right,bottom,left&gt; or <code>bbox</code></h4>
-<p>Each margin value can be specified in 1/72 inch or in percentage followed by %.
-Special value <code>bbox</code> means the bounding box of the page, which is automatically calculated.</p>
+<p>Process only even pages.</p>
+<h4 id="flip">--flip</h4>
+<p>Flip the margin, page by page.</p>
+<h4 id="m---margintoprightbottomleft-bbox-or-text-bbox">-m, --margin=&lt;top,right,bottom,left&gt;, <code>bbox</code>, or <code>text-bbox</code></h4>
+<p>Each margin can be specified in 1/72 inch or % unit.
+Special value <code>bbox</code> means calculated bounding box of the page. Another value <code>text-bbox</code> means bounding box of the texts in the page. (default value: <code>bbox</code>)</p>
 <h4 id="o---outputoutput">-o, --output=&lt;output&gt;</h4>
-<p>This option specifies the path where the modified PDF will be outputted.</p>
+<p>Path to the converted PDF document.</p>
 <h4 id="odd">--odd</h4>
-<p>This option causes only <em>odd</em> pages to be cropped.</p>
+<p>Process only odd pages.</p>
+<h4 id="paddingpadding">--padding=&lt;padding&gt;</h4>
+<p>Padding size in 1/72 inch added to bounding boxes.
+(default value: <code>5</code>)</p>
 <h4 id="pagespagerangepagerange">--pages=&lt;page|range(,page|range)*&gt;</h4>
-<p>This option limits the pages to be cropped using their page numbers. The page number starts from 1 and negative values start from the final page of the document. The page ranges can be presented in the form of <code>&lt;start page&gt;:&lt;end page&gt;</code> where both bounds are inclusive.</p>
+<p>Pages or page ranges delimited by comma.
+Each range is in the form <code>&lt;first page&gt;-&lt;last page&gt;</code>,
+both bounds are inclusive and one-indexed.
+Page numbers can be prefixed with <code>b</code> when counted from the back cover.</p>
 <h4 id="preserve-aspect">--preserve-aspect</h4>
-<p>This option preserves the original aspect ratio of each page.</p>
+<p>Preserve the original aspect ratio of pages.</p>
 <h4 id="examples">Examples</h4>
-<h5 id="cropping-with-fixed-margin">Cropping with fixed margin</h5>
+<h5 id="cropping-a-pdf-with-the-specified-margin"><strong>Cropping a PDF with the specified margin</strong></h5>
 <p>Cropping pages from the 2nd to the last with the magin of top, right, bottom specified in 1/72 inch. The omitted left margin will be the same as the right margin.</p>
-<pre class="hljs"><code><div>pandora crop --pages 2:-1 -m 50,40,30 -o Classic_Shell_Scripting.cropped.pdf Classic_Shell_Scripting.pdf
+<pre class="hljs"><code><div>pandora crop --pages 2-b1 -m 50,40,30 -o Classic_Shell_Scripting.cropped.pdf Classic_Shell_Scripting.pdf
+</div></code></pre>
+<h5 id="cropping-a-pdf-with-automatically-calculated-bounding-boxes"><strong>Cropping a PDF with automatically calculated bounding boxes</strong></h5>
+<pre class="hljs"><code><div>pandora crop "Zero Trust Networks.pdf"
 </div></code></pre>
 <h3 id="help">help</h3>
 <p>Displays help information about the specified command.</p>
 <h4 id="examples">Examples</h4>
-<h5 id="displaying-help-about-the-command">Displaying help about the command</h5>
+<h5 id="displaying-help-about-a-command"><strong>Displaying help about a command</strong></h5>
 <pre class="hljs"><code><div>pandora help crop
 </div></code></pre>
 <h2 id="copyright-notice">Copyright Notice</h2>
-<p>Copyright 2020 the original author or authors. All rights reserved.</p>
+<p>Copyright 2020-2021 the original author or authors. All rights reserved.</p>
 <p>Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
 you may not use this product except in compliance with the License.
 You may obtain a copy of the License at

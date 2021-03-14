@@ -15,50 +15,72 @@ pandora <command>
 ## Commands
 ### crop
 
-Assigns crop box to the PDF.
+Assigns a crop box to the PDF document.
 
 ```shell
-pandora crop [--even] [--odd] [--preserve-aspect] -m=<top,right,bottom,left> or "bbox" -o=<output> [--pages=<page|range(,page|range)*>] <input>
+pandora crop [--even] [--flip] [--odd] [--preserve-aspect] [-a=<numeric value or paper size name>] [-o=<output>] [--padding=<padding>] [--pages=<page|range(,page|range)*>] [-m=<top,right,bottom,left>, "bbox", or "text-bbox"]... <input>
 ```
-#### --even
-This option causes only _even_ pages to be cropped.
+#### \<input\>
+Path to the original PDF document.
 
-#### -m, --margin=\<top,right,bottom,left\> or `bbox`
-Each margin value can be specified in 1/72 inch or in percentage followed by %.
-Special value `bbox` means the bounding box of the page, which is automatically calculated.
+#### -a, --aspect=\<numeric value or paper size name\>
+Page aspect ratio to be forced. e.g. `0.75`, `3:4`, `a4`
+
+#### --even
+Process only even pages.
+
+#### --flip
+Flip the margin, page by page.
+
+#### -m, --margin=\<top,right,bottom,left\>, `bbox`, or `text-bbox`
+
+Each margin can be specified in 1/72 inch or % unit.
+Special value `bbox` means calculated bounding box of the page. Another value `text-bbox` means bounding box of the texts in the page. (default value: `bbox`)
 
 #### -o, --output=\<output\>
-This option specifies the path where the modified PDF will be outputted.
+Path to the converted PDF document.
 
 #### --odd
-This option causes only _odd_ pages to be cropped.
+Process only odd pages.
 
-#### --pages=<page|range(,page|range)*>
-This option limits the pages to be cropped using their page numbers. The page number starts from 1 and negative values start from the final page of the document. The page ranges can be presented in the form of `<start page>:<end page>` where both bounds are inclusive.
+#### --padding=\<padding\>
+Padding size in 1/72 inch added to bounding boxes.
+(default value: `5`)
+
+#### --pages=\<page|range(,page|range)*\>
+Pages or page ranges delimited by comma.
+Each range is in the form `<first page>-<last page>`,
+both bounds are inclusive and one-indexed.
+Page numbers can be prefixed with `b` when counted from the back cover.
 
 #### --preserve-aspect
-This option preserves the original aspect ratio of each page.
+Preserve the original aspect ratio of pages.
 
 #### Examples
-##### Cropping with fixed margin
+##### **Cropping a PDF with the specified margin**
 
 Cropping pages from the 2nd to the last with the magin of top, right, bottom specified in 1/72 inch. The omitted left margin will be the same as the right margin.
+
 ```shell
-pandora crop --pages 2:-1 -m 50,40,30 -o Classic_Shell_Scripting.cropped.pdf Classic_Shell_Scripting.pdf
+pandora crop --pages 2-b1 -m 50,40,30 -o Classic_Shell_Scripting.cropped.pdf Classic_Shell_Scripting.pdf
+```
+##### **Cropping a PDF with automatically calculated bounding boxes**
+
+```shell
+pandora crop "Zero Trust Networks.pdf"
 ```
 
 ### help
-
 Displays help information about the specified command.
 
 #### Examples
-##### Displaying help about the command
+##### **Displaying help about a command**
 ```shell
 pandora help crop
 ```
 
 ## Copyright Notice
-Copyright 2020 the original author or authors. All rights reserved.
+Copyright 2020-2021 the original author or authors. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this product except in compliance with the License.
