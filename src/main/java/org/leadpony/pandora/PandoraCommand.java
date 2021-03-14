@@ -26,6 +26,7 @@ import java.util.logging.LogManager;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.PropertiesDefaultProvider;
 
 /**
  * The top-level command.
@@ -70,6 +71,7 @@ class PandoraCommand {
                 .addSubcommand(new CommandLine.HelpCommand())
                 .addSubcommand(new CropCommand())
                 .setResourceBundle(getResourceBundle())
+                .setDefaultValueProvider(new PropertiesDefaultProvider())
                 .setOut(out)
                 .setErr(err);
 
