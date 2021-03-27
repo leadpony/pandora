@@ -95,9 +95,19 @@ class CropCommand extends AbstractCommand implements CroppingContext {
     }
 
     @Override
-    protected void processPage(PDPage page, int pageNo) {
-        PDRectangle mediaBox = page.getMediaBox();
-        PDRectangle cropBox = strategy.getCropBox(page, pageNo);
+    protected void processPage(PDDocument doc, int pageIndex) {
+        PDPage page = doc.getPage(pageIndex);
+        resetCropBox(page);
+        PDRectangle cropBox = strategy.getCropBox(doc, pageIndex);
+        updateCropBox(page, cropBox);
+    }
+
+    private void resetCropBox(PDPage page) {
+        page.setCropBox(page.getMediaBox());
+    }
+
+    private void updateCropBox(PDPage page, PDRectangle cropBox) {
+        final PDRectangle mediaBox = page.getMediaBox();
         if (preserveAspect) {
             cropBox = adjustBoxAspect(cropBox, mediaBox);
         } else if (aspect != null) {

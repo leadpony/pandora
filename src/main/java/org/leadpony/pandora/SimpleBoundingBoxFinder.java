@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,21 @@
 
 package org.leadpony.pandora;
 
-import java.util.List;
+import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.PDPage;
 
-/**
- * @author leadpony
- */
-class FlippingCropStrategy implements CropStrategy {
-
-    private final List<CropStrategy> strategies;
-
-    FlippingCropStrategy(List<CropStrategy> strategies) {
-        this.strategies = strategies;
-    }
+class SimpleBoundingBoxFinder implements BoundingBoxFinder {
 
     @Override
-    public PDRectangle getCropBox(PDDocument doc, int pageIndex) {
-        CropStrategy strategy = strategies.get(pageIndex % strategies.size());
-        return strategy.getCropBox(doc, pageIndex);
+    public Rectangle2D getBoundingBox(PDPage page) throws IOException {
+        var calculator = createCalculator(page);
+        calculator.processPage(page);
+        return calculator.getBoundingBox();
+    }
+
+    protected BoundingBoxCalculator createCalculator(PDPage page) {
+        return new BoundingBoxCalculator(page);
     }
 }

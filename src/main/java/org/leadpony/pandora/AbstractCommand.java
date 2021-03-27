@@ -25,7 +25,6 @@ import java.util.concurrent.Callable;
 import java.util.function.IntPredicate;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -95,9 +94,8 @@ abstract class AbstractCommand implements Callable<Integer> {
         final int totalPages = doc.getNumberOfPages();
         IntPredicate predicate = getPagePredicate(totalPages);
         for (int i = 0; i < totalPages; i++) {
-            int pageNo = i + 1;
-            if (predicate.test(pageNo)) {
-                processPage(doc.getPage(i), pageNo);
+            if (predicate.test(i + 1)) {
+                processPage(doc, i);
             }
         }
     }
@@ -107,10 +105,10 @@ abstract class AbstractCommand implements Callable<Integer> {
     /**
      * Processes a page of the PDF document.
      *
-     * @param page the page to process, never be {@code null}.
-     * @param pageNo the page number starting from 1.
+     * @param doc the PDF document to process, cannot be {@code null}.
+     * @param pageIndex the page index starting from zero.
      */
-    protected abstract void processPage(PDPage page, int pageNo);
+    protected abstract void processPage(PDDocument document, int pageIndex);
 
     protected String getDefaultOutputSuffix() {
         return "converted";

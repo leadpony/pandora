@@ -20,7 +20,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 
-import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 /**
@@ -31,28 +31,28 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 class BoundsCropStrategy implements CropStrategy {
 
     private final float padding;
+    private final BoundingBoxFinder finder;
 
     BoundsCropStrategy(CroppingContext context) {
+        this(context, BoundingBoxFinder.SIMPLE);
+    }
+
+    BoundsCropStrategy(CroppingContext context, BoundingBoxFinder finder) {
         this.padding = context.getPadding();
+        this.finder = finder;
     }
 
     @Override
-    public PDRectangle getCropBox(PDPage page, int pageNo) {
-        BoundingBoxFinder finder = createBoundingBoxFinder(page);
+    public PDRectangle getCropBox(PDDocument doc, int pageIndex) {
         try {
-            finder.processPage(page);
-            Rectangle2D box = finder.getBoundingBox();
+            Rectangle2D box = finder.getBoundingBox(doc, pageIndex);
             if (box == null) {
-                return page.getMediaBox();
+                return doc.getPage(pageIndex).getMediaBox();
             }
             return rectangleFrom(box, this.padding);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-    }
-
-    protected BoundingBoxFinder createBoundingBoxFinder(PDPage page) {
-        return new BoundingBoxFinder(page);
     }
 
     private static PDRectangle rectangleFrom(Rectangle2D box, float padding) {

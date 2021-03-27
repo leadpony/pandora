@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,34 +25,42 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImage;
 /**
  * @author leadpony
  */
-class TextBoundingBoxFinder extends BoundingBoxFinder {
-
-    TextBoundingBoxFinder(PDPage page) {
-        super(page);
-    }
+class TextBoundingBoxFinder extends SimpleBoundingBoxFinder {
 
     @Override
-    public void appendRectangle(Point2D p0, Point2D p1, Point2D p2, Point2D p3) throws IOException {
-        // Does nothing
+    protected BoundingBoxCalculator createCalculator(PDPage page) {
+        return new TextBoundingBoxCalculator(page);
     }
 
-    @Override
-    public void drawImage(PDImage pdImage) throws IOException {
-        // Does nothing
-    }
+    protected static class TextBoundingBoxCalculator extends BoundingBoxCalculator {
 
-    @Override
-    public void moveTo(float x, float y) throws IOException {
-        // Does nothing
-    }
+        TextBoundingBoxCalculator(PDPage page) {
+            super(page);
+        }
 
-    @Override
-    public void lineTo(float x, float y) throws IOException {
-        // Does nothing
-    }
+        @Override
+        public void appendRectangle(Point2D p0, Point2D p1, Point2D p2, Point2D p3) throws IOException {
+            // Does nothing
+        }
 
-    @Override
-    public void curveTo(float x1, float y1, float x2, float y2, float x3, float y3) throws IOException {
-        // Does nothing
+        @Override
+        public void drawImage(PDImage pdImage) throws IOException {
+            // Does nothing
+        }
+
+        @Override
+        public void moveTo(float x, float y) throws IOException {
+            // Does nothing
+        }
+
+        @Override
+        public void lineTo(float x, float y) throws IOException {
+            // Does nothing
+        }
+
+        @Override
+        public void curveTo(float x1, float y1, float x2, float y2, float x3, float y3) throws IOException {
+            // Does nothing
+        }
     }
 }

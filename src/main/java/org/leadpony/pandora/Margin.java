@@ -19,7 +19,6 @@ package org.leadpony.pandora;
 import java.util.Objects;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 
 /**
  * A margin option.
@@ -28,13 +27,12 @@ import org.apache.pdfbox.pdmodel.PDPage;
  */
 interface Margin {
 
-    Margin BOUNDING_BOX_MARGIN = (doc, context) -> new BoundsCropStrategy(context);
+    Margin BOUNDING_BOX_MARGIN = (doc, context) -> {
+        return new BoundsCropStrategy(context, new ImageBasedBoundingBoxFinder(doc));
+    };
 
-    Margin TEXT_BOUNDING_BOX_MARGIN = (doc, context) -> new BoundsCropStrategy(context) {
-        @Override
-        protected BoundingBoxFinder createBoundingBoxFinder(PDPage page) {
-            return new TextBoundingBoxFinder(page);
-        }
+    Margin TEXT_BOUNDING_BOX_MARGIN = (doc, context) -> {
+        return new BoundsCropStrategy(context, BoundingBoxFinder.TEXT_ONLY);
     };
 
     /**

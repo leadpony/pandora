@@ -16,7 +16,7 @@
 
 package org.leadpony.pandora;
 
-import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 /**
@@ -29,9 +29,10 @@ interface CropStrategy {
     /**
      * Calculates the crop box of the page.
      *
-     * @param page the page to crop.
-     * @param pageNo the page number starting from 1.
+     * @param doc the PDF document to crop.
+     * @param pageIndex the page number starting from zero.
+     *
      * @return the crop box calculated, must not be {@code null}.
      */
-    PDRectangle getCropBox(PDPage page, int pageNo);
+    PDRectangle getCropBox(PDDocument doc, int pageIndex);
 }

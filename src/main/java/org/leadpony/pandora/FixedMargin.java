@@ -145,8 +145,8 @@ class FixedMargin implements Margin {
         }
 
         @Override
-        public PDRectangle getCropBox(PDPage page, int pageNo) {
-            return margin.getCropBox(page);
+        public PDRectangle getCropBox(PDDocument doc, int pageIndex) {
+            return margin.getCropBox(doc.getPage(pageIndex));
         }
     }
 }
