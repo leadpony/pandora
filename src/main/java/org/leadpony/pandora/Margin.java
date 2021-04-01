@@ -31,6 +31,10 @@ interface Margin {
         return new BoundsCropStrategy(context, new ImageBasedBoundingBoxFinder(doc));
     };
 
+    Margin FAST_BOUNDING_BOX_MARGIN = (doc, context) -> {
+        return new BoundsCropStrategy(context, BoundingBoxFinder.SIMPLE);
+    };
+
     Margin TEXT_BOUNDING_BOX_MARGIN = (doc, context) -> {
         return new BoundsCropStrategy(context, BoundingBoxFinder.TEXT_ONLY);
     };
@@ -45,6 +49,8 @@ interface Margin {
         Objects.requireNonNull(value, "value must not be null.");
         if ("bbox".equalsIgnoreCase(value)) {
             return BOUNDING_BOX_MARGIN;
+        } else if ("fast-bbox".equalsIgnoreCase(value)) {
+            return FAST_BOUNDING_BOX_MARGIN;
         } else if ("text-bbox".equalsIgnoreCase(value)) {
             return TEXT_BOUNDING_BOX_MARGIN;
         }

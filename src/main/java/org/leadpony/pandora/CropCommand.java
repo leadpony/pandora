@@ -34,11 +34,12 @@ import picocli.CommandLine.Option;
 class CropCommand extends AbstractCommand implements CroppingContext {
 
     @Option(names = { "-m", "--margin" },
-            paramLabel = "<top,right,bottom,left>, \"bbox\", or \"text-bbox\"",
+            paramLabel = "<top,right,bottom,left>, \"bbox\", \"fast-bbox\", or \"text-bbox\"",
             description = {
                 "Each margin can be specified in 1/72 inch or %% unit.",
-                "Special value \"bbox\" means calculated bounding box of the page.",
-                "\"text-bbox\" means bounding box of the texts in the page.",
+                "Special value \"bbox\" calculates bounding box for each page.",
+                "\"fast-bbox\" produces approximate bounding box for each page.",
+                "\"text-bbox\" produces bounding box only from texts in each page.",
                 "(default value: \"bbox\")"
             },
             defaultValue = "bbox")
