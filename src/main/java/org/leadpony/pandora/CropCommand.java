@@ -126,13 +126,13 @@ class CropCommand extends AbstractCommand implements CroppingContext {
     private static PDRectangle adjustBoxAspect(PDRectangle box, float aspectRatio) {
         final float newAspectRatio = box.getWidth() / box.getHeight();
         if (newAspectRatio < aspectRatio) {
-            float width = box.getHeight() * aspectRatio;
-            float x = box.getLowerLeftX() - 0.5f * (width - box.getWidth());
-            return new PDRectangle(x, box.getLowerLeftY(), width, box.getHeight());
+            float newWidth = box.getHeight() * aspectRatio;
+            float x = box.getLowerLeftX() - 0.5f * (newWidth - box.getWidth());
+            return new PDRectangle(x, box.getLowerLeftY(), newWidth, box.getHeight());
         } else if (newAspectRatio > aspectRatio) {
-            float height = box.getWidth() / aspectRatio;
-            float y = box.getLowerLeftY() - 0.5f * (height - box.getHeight());
-            return new PDRectangle(box.getLowerLeftX(), y, box.getWidth(), height);
+            float newHeight = box.getWidth() / aspectRatio;
+            float y = box.getUpperRightY() - newHeight;
+            return new PDRectangle(box.getLowerLeftX(), y, box.getWidth(), newHeight);
         }
         return box;
     }
